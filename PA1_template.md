@@ -1,13 +1,6 @@
----
-title: "Assignment 1"
-output: 
-  html_document: 
-    keep_md: yes
----
+# Assignment 1
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+
 
 ## Question #1
 
@@ -22,37 +15,73 @@ Calculate and report the mean and median of the total number of steps taken per 
 
   
 Load packages needed for assignment
-```{r}
+
+```r
 library(dplyr)
+```
+
+```
+## Warning: package 'dplyr' was built under R version 3.2.3
+```
+
+```
+## 
+## Attaching package: 'dplyr'
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+```
+
+```r
 library(lattice)
 ```
 
   
 Read in the file
-```{r}
+
+```r
 ds <- read.csv("activity.csv")
 ```
 
   
 Get total steps per day and update the column names
-```{r}
+
+```r
 stepsPerDay <- aggregate(x=ds$steps, by=list(ds$date), FUN=sum)
 colnames(stepsPerDay) <- c("date", "steps")
 ```
 
   
 Create histogram
-```{r}
+
+```r
 hist(stepsPerDay$steps, 
      main="Total Number of Steps Taken Each Day", 
      xlab="Number of Steps", 
      col="brown")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png)
+
   
 Report the mean and median for total steps taken per day
-```{r} 
+
+```r
 summarise(stepsPerDay, mean(steps,na.rm=TRUE), median(steps,na.rm=TRUE))
+```
+
+```
+##   mean(steps, na.rm = TRUE) median(steps, na.rm = TRUE)
+## 1                  10766.19                       10765
 ```
 
 
@@ -68,13 +97,15 @@ Which 5-minute interval, on average across all the days in the dataset, contains
 
   
 Get average steps taken for 5 min intervals
-```{r}
+
+```r
 intervals <- aggregate(data=ds, steps~interval, FUN=mean, na.action=na.omit)
 ```
 
   
 Create time series plot
-```{r} 
+
+```r
 with(intervals, {
      plot(
           x=interval,
@@ -87,10 +118,17 @@ with(intervals, {
 })
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-7-1.png)
+
 
 Get the interval with the maximum average number of steps
-```{r}
+
+```r
 intervals$interval[ which.max(intervals$steps) ]
+```
+
+```
+## [1] 835
 ```
 
 
@@ -117,8 +155,13 @@ total daily number of steps?
 
   
 Calculate and report the total number of missing values in the dataset
-```{r}
+
+```r
 sum(is.na(ds$steps))
+```
+
+```
+## [1] 2304
 ```
 
 Create new dataset filling in the NAs with 0  
@@ -126,7 +169,8 @@ Create new dataset filling in the NAs with 0
 - replace NA values in steps column with value 0  
 - get steps per day from new dataset  
 - rename columns   
-``` {r} 
+
+```r
 dsFillNA <- ds
 dsFillNA$steps[is.na(dsFillNA$steps)] <- 0
 newStepsPerDay <- aggregate(x=dsFillNA$steps, by=list(dsFillNA$date), FUN=sum)
@@ -135,7 +179,8 @@ colnames(newStepsPerDay) <- c("date", "steps")
 
   
 Create histogram of steps per day
-```{r} 
+
+```r
 hist(newStepsPerDay$steps, 
      main="Total Number of Steps Taken Each Day (NA values replaced with value 0)", 
      xlab="Number of Steps", 
@@ -143,10 +188,18 @@ hist(newStepsPerDay$steps,
      border="white")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-11-1.png)
+
   
 Report the mean and median for total steps taken per day with no NA values
-```{r}
+
+```r
 summarise(newStepsPerDay, mean(steps), median(steps))
+```
+
+```
+##   mean(steps) median(steps)
+## 1     9354.23         10395
 ```
 
 **Do these values differ from the estimates from the first part of the assignment?**  
@@ -177,7 +230,8 @@ Create new dataset using dataset with filled in NA values
 - add column with day type  
 - rename columns  
 - get steps per dayType per interval  
-```{r}
+
+```r
 dsWithWeekday <- mutate(dsFillNA, dayofWeek=weekdays(as.Date(dsFillNA$date)))
 dsDayType <- data.frame(sapply(X = dsWithWeekday$date, FUN = function(day) {
      if (weekdays(as.Date(day)) %in% c("Monday", "Tuesday", "Wednesday", "Thursday", 
@@ -198,7 +252,8 @@ dsDayTypeSteps <- aggregate(
 
   
 Create a panel plot containing time series plot for both weekend and weekday data for comparison
-```{r} 
+
+```r
 xyplot(
      type="l",
      data=dsDayTypeSteps,
@@ -208,3 +263,5 @@ xyplot(
      layout=c(1,2)
 )
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-14-1.png)
